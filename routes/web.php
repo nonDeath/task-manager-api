@@ -28,3 +28,5 @@ $app->get('tasks/{task}', 'TasksController@show');
 $app->post('tasks', 'TasksController@store');
 $app->patch('tasks/{task}', 'TasksController@update');
 $app->delete('tasks/{task}', 'TasksController@destroy');
+
+$app->post('auth/login', 'AuthController@login');
