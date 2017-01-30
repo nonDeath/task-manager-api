@@ -12,16 +12,16 @@ class Task extends Model
 
     public function priority()
     {
-        return $this->belongsTo(App\Priority::class);
+        return $this->belongsTo(\App\Priority::class);
     }
 
     public function createdBy()
     {
-        return $this->belongsTo(App\User::class, 'created_by');
+        return $this->belongsTo(\App\User::class, 'created_by');
     }
 
     public function assignedTo()
     {
-        return $this->belongsTo(App\User::class, 'assigned_to');
+        return $this->belongsTo(\App\User::class, 'assigned_to');
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\User;
+use App\Task;
 
 class TasksController extends Controller
 {
@@ -12,7 +12,7 @@ class TasksController extends Controller
      *
      * @return void
      */
-    public function __construct(User $tasks)
+    public function __construct(Task $tasks)
     {
         $this->tasks = $tasks;
     }
@@ -28,7 +28,7 @@ class TasksController extends Controller
                     'createdBy',
                     'assignedTo'
                 ])
-                ->all()
+                ->get()
         );
     }
 
@@ -53,9 +53,9 @@ class TasksController extends Controller
                 'title' => 'string|required',
                 'description' => 'string|required',
                 'due_date' => 'required|date',
-                'created_by' => 'required|exists:users',
-                'assigned_to' => 'exists:users',
-                'priority_id' => 'required|exists:priorities'
+                'created_by' => 'required|exists:users,id',
+                'assigned_to' => 'exists:users,id',
+                'priority_id' => 'required|exists:priorities,id'
             ]
         );
 
