@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Task;
+use League\Fractal\Manager;
 
-class TasksController extends Controller
+class TasksController extends ApiController
 {
+    use \App\Traits\FractableTrait;
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Task $tasks)
+    public function __construct(Manager $manager, Task $tasks)
     {
+        parent::__construct($manager);
         $this->tasks = $tasks;
     }
 
@@ -21,28 +23,31 @@ class TasksController extends Controller
 
     public function index()
     {
-        return response()->json(
-            $this->tasks
-                ->with([
-                    'priority',
-                    'createdBy',
-                    'assignedTo'
-                ])
-                ->get()
+        $tasks = $this->tasks
+            ->with([
+                'priority',
+                'createdBy',
+                'assignedTo'
+            ])
+            ->paginate(10);
+
+        return $this->respondWithCollection(
+            $tasks,
+            new \App\Transformers\TaskTransformer
         );
     }
 
     public function show($id)
     {
-        return response()->json(
-            $this->tasks
-                ->with([
-                    'priority',
-                    'createdBy',
-                    'assignedTo'
-                ])
-                ->findOrFail($id)
-        );
+        $task = $this->tasks
+            ->with([
+                'priority',
+                'createdBy',
+                'assignedTo'
+            ])
+            ->findOrFail($id);
+
+        return $this->respondWithItem($task, new \App\Transformers\TaskTransformer);
     }
 
     public function store(Request $request)
@@ -61,7 +66,7 @@ class TasksController extends Controller
 
         $task = $this->tasks->create($request->all());
 
-        return response()->json($task);
+        return $this->respondWithItem($task, new \App\Transformers\TaskTransformer);
     }
 
     public function update(Request $request, $id)
@@ -81,7 +86,7 @@ class TasksController extends Controller
         $task = $this->tasks->findOrFail($id);
         $task->update($request->all());
 
-        return response()->json($task);
+        return $this->respondWithItem($task, new \App\Transformers\TaskTransformer);
     }
 
     public function destroy($id)

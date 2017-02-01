@@ -2,32 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\User;
+use App\Transformers\UserTransformer;
+use League\Fractal\Manager;
 
-class UsersController extends Controller
+class UsersController extends ApiController
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct(User $users)
+    public function __construct(Manager $manager, User $users)
     {
+        parent::__construct($manager);
         $this->users = $users;
     }
 
-    //
-
     public function index()
     {
-        return response()->json($this->users->all());
+        return $this->respondWithCollection(
+            $this->users->paginate(10),
+            new UserTransformer
+        );
     }
 
     public function show($id)
     {
-        return response()->json(
-            $this->users->findOrFail($id)
+        return $this->respondWithItem(
+            $this->users->findOrFail($id),
+            new UserTransformer
         );
     }
 
@@ -44,7 +43,10 @@ class UsersController extends Controller
 
         $user = $this->users->create($request->all());
 
-        return response()->json($user);
+        return $this->respondWithItem(
+            $user,
+            new UserTransformer
+        );
     }
 
     public function update(Request $request, $id)
@@ -62,7 +64,10 @@ class UsersController extends Controller
         $user = $this->users->findOrFail($id);
         $user->update($request->all());
 
-        return response()->json($user);
+        return $this->respondWithItem(
+            $user,
+            new UserTransformer
+        );
     }
 
     public function destroy($id)
